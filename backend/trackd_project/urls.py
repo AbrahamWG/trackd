@@ -1,4 +1,13 @@
 """
+This file maps URLs to my views (like a routing table)
+- When someone visits /api/actions/, Django looks here to find which function to call
+- I'll add routes here to connect URLs to my API endpoints in views.py
+
+Example: path('api/actions/', views.get_actions) means:
+  "When someone visits /api/actions/, run the get_actions function"
+"""
+
+"""
 URL configuration for trackd_project project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:

@@ -1,3 +1,6 @@
+# This file tells Django about my 'actions' app
+# It registers the app so Django knows it exists
+
 from django.apps import AppConfig
 
 
