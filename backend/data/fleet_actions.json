@@ -30,5 +30,21 @@
     "co2_emitted_kg": 422.4,
     "fuel_cost_usd": 144.0,
     "notes": "Replaced WhatsApp: 'Boss sudah sampai Surabaya, pakai 3 tangki'"
+  },
+  {
+    "action": "Jakarta to Yogyakarta delivery",
+    "date": "2025-01-17",
+    "points": 18,
+    "vehicle_id": "TRUCK-002",
+    "vehicle_type": "TRUCK_NEW",
+    "driver_name": "Siti Nurhaliza",
+    "origin": "Jakarta",
+    "destination": "Yogyakarta",
+    "distance_km": 550.0,
+    "fuel_consumed_liters": 64.7,
+    "fuel_cost_usd": 58.23,
+    "notes": "Electronics shipment",
+    "id": 3,
+    "co2_emitted_kg": 170.80800000000002
   }
 ]
