@@ -104,3 +104,63 @@ class ActionListView(APIView):
         
         # Return the created action with 201 status
         return Response(new_action, status=status.HTTP_201_CREATED)
+
+
+class ActionDetailView(APIView):
+    """
+    GET /api/actions/<id>/ - Get single action by ID
+    """
+    
+    def _get_json_file_path(self):
+        """
+        Helper method to get the path to the JSON file.
+        
+        Why use a helper? We need to read/write the JSON file in multiple methods
+        (GET, PUT, PATCH, DELETE). Instead of repeating the file path logic
+        everywhere, we define it once here. If the file location changes, we only
+        need to update it in one place.
+        """
+        base_dir = Path(__file__).resolve().parent.parent
+        return base_dir / 'data' / 'fleet_actions.json'
+    
+    def _read_actions(self):
+        """
+        Helper method to read actions from JSON file.
+        
+        Why use a helper? We read from the JSON file in GET, PUT, PATCH, DELETE.
+        This avoids repeating the same file reading code (open, json.load, error handling)
+        in every method. Makes code DRY (Don't Repeat Yourself) and easier to maintain.
+        
+        Returns:
+            list: List of action dictionaries, or empty list if file doesn't exist
+        """
+        json_file = self._get_json_file_path()
+        try:
+            with open(json_file, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return []
+    
+    def get(self, request, pk):
+        """
+        GET /api/actions/<id>/ - Returns single action by ID
+        
+        Args:
+            pk: Primary key (ID) of the action to retrieve
+            
+        Returns:
+            Response: The action if found, or 404 if not found
+        """
+        # Read all actions from file
+        actions = self._read_actions()
+        
+        # Find the action with matching ID
+        for action in actions:
+            if action.get('id') == pk:
+                return Response(action)
+        
+        # If no action found, return 404
+        return Response(
+            {'error': 'Action not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )

@@ -2,8 +2,9 @@
 # It maps URLs like 'actions/' to specific views
 
 from django.urls import path
-from .views import ActionListView
+from .views import ActionListView, ActionDetailView
 
 urlpatterns = [
     path('actions/', ActionListView.as_view(), name='action-list'),
+    path('actions/<int:pk>/', ActionDetailView.as_view(), name='action-detail'),
 ]
