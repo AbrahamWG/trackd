@@ -1,27 +1,46 @@
-# Trackd - Sustainability Actions API
+# Trackd - Sustainability Actions Tracker
 
-A Django REST API for managing sustainability actions. Track actions with names, dates, and points.
+A full-stack application for managing sustainability actions. Built with Django REST API backend and React frontend. Track actions with names, dates, and points.
 
 ## 🚀 Quick Start
 
-### 1. Setup Virtual Environment
+### Backend Setup
+
+#### 1. Setup Virtual Environment
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-### 2. Install Dependencies
+#### 2. Install Python Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Start the Server
+#### 3. Start the Django Server
 ```bash
 cd backend
 python manage.py runserver
 ```
 
 The API will be available at: **http://localhost:8000**
+
+### Frontend Setup
+
+#### 1. Install Node Dependencies
+```bash
+cd frontend
+npm install
+```
+
+#### 2. Start the React App
+```bash
+npm start
+```
+
+The frontend will be available at: **http://localhost:3000**
+
+**Note:** Make sure the Django backend is running before starting the frontend.
 
 ---
 
@@ -161,6 +180,16 @@ trackd/
 │   │   └── fleet_actions.json  # Data storage
 │   ├── trackd_project/      # Django settings
 │   └── manage.py            # Django management
+├── frontend/
+│   ├── src/
+│   │   ├── components/      # React components
+│   │   │   ├── ActionTable.js    # Table display
+│   │   │   ├── ActionForm.js     # Add form
+│   │   │   └── EditForm.js       # Edit form
+│   │   ├── services/
+│   │   │   └── api.js       # API service layer
+│   │   └── App.js           # Main component
+│   └── package.json         # Node dependencies
 ├── requirements.txt         # Python dependencies
 └── README.md               # This file
 ```
@@ -181,26 +210,48 @@ All data is stored in `backend/data/fleet_actions.json`. The file is automatical
 
 ## 🛠️ Technologies
 
+### Backend
 - Django 6.0.1
 - Django REST Framework 3.16.1
 - django-cors-headers 4.9.0
+
+### Frontend
+- React 19.2.3
+- Axios 1.13.2 (for API calls)
 
 ---
 
 ## ✅ Features
 
+### Backend
 - ✅ RESTful API design
 - ✅ CRUD operations (Create, Read, Update, Delete)
 - ✅ JSON file storage (no database needed)
 - ✅ Auto-generated IDs
 - ✅ Error handling (404 for not found)
 - ✅ Browsable API interface (visit URLs in browser)
+- ✅ CORS enabled for frontend integration
+
+### Frontend
+- ✅ Display actions in table format
+- ✅ Add new actions with form
+- ✅ Edit existing actions (PATCH)
+- ✅ Delete actions with confirmation
+- ✅ Error handling and loading states
+- ✅ Real-time updates after operations
 
 ---
 
 ## 📝 Notes
 
+### Backend
 - No database migrations needed (using JSON file storage)
 - No superuser/admin setup needed
 - Data persists in JSON file (survives server restarts)
 - CORS enabled for frontend integration (localhost:3000)
+
+### Frontend
+- Requires Node.js and npm installed
+- Connects to backend API at `http://localhost:8000`
+- Uses functional components and React hooks (useState, useEffect)
+- Separation of concerns: API calls in `services/api.js`, UI in components
