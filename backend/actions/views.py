@@ -111,6 +111,7 @@ class ActionDetailView(APIView):
     GET /api/actions/<id>/ - Get single action by ID
     PUT /api/actions/<id>/ - Full update of an action
     PATCH /api/actions/<id>/ - Partial update of an action
+    DELETE /api/actions/<id>/ - Delete an action
     """
     
     def _get_json_file_path(self):
@@ -280,6 +281,39 @@ class ActionDetailView(APIView):
                 
                 # Return updated action
                 return Response(updated_action)
+        
+        # If no action found, return 404
+        return Response(
+            {'error': 'Action not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    def delete(self, request, pk):
+        """
+        DELETE /api/actions/<id>/ - Delete an action
+        
+        Removes the action from the JSON file permanently.
+        
+        Args:
+            pk: Primary key (ID) of the action to delete
+            
+        Returns:
+            Response: 204 No Content if deleted successfully, or 404 if not found
+        """
+        # Read all actions from file
+        actions = self._read_actions()
+        
+        # Find and remove the action with matching ID
+        for i, action in enumerate(actions):
+            if action.get('id') == pk:
+                # Remove the action from the list
+                deleted_action = actions.pop(i)
+                
+                # Save back to file
+                self._save_actions(actions)
+                
+                # Return 204 No Content (standard for successful DELETE)
+                return Response(status=status.HTTP_204_NO_CONTENT)
         
         # If no action found, return 404
         return Response(
