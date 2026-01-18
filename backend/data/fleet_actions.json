@@ -14,5 +14,17 @@
     "notes": "Electronics shipment",
     "id": 3,
     "co2_emitted_kg": 170.80800000000002
+  },
+  {
+    "action": "Recycling",
+    "date": "2025-01-08",
+    "points": 25,
+    "id": 4
+  },
+  {
+    "action": "New action",
+    "date": "2025-01-20",
+    "points": 10,
+    "id": 5
   }
 ]
