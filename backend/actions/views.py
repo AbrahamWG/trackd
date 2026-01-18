@@ -109,6 +109,7 @@ class ActionListView(APIView):
 class ActionDetailView(APIView):
     """
     GET /api/actions/<id>/ - Get single action by ID
+    PUT /api/actions/<id>/ - Full update of an action
     """
     
     def _get_json_file_path(self):
@@ -141,6 +142,27 @@ class ActionDetailView(APIView):
         except FileNotFoundError:
             return []
     
+    def _save_actions(self, actions):
+        """
+        Helper method to save actions to JSON file.
+        
+        Why use a helper? We save to the JSON file in PUT, PATCH, DELETE.
+        This avoids repeating the same file writing code (create directory, open, json.dump)
+        in every method. Makes code DRY and easier to maintain.
+        
+        Why save? Without saving, data only exists in memory and disappears when the server
+        restarts. Saving to a file makes data persistent - it survives server restarts and
+        can be retrieved later.
+        
+        Args:
+            actions (list): List of action dictionaries to save
+        """
+        json_file = self._get_json_file_path()
+        # Create data directory if it doesn't exist
+        json_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(json_file, 'w') as f:
+            json.dump(actions, f, indent=2)
+    
     def get(self, request, pk):
         """
         GET /api/actions/<id>/ - Returns single action by ID
@@ -158,6 +180,51 @@ class ActionDetailView(APIView):
         for action in actions:
             if action.get('id') == pk:
                 return Response(action)
+        
+        # If no action found, return 404
+        return Response(
+            {'error': 'Action not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    def put(self, request, pk):
+        """
+        PUT /api/actions/<id>/ - Full update of an action
+        
+        PUT replaces the entire action with new data. You must send ALL fields.
+        This is different from PATCH which only updates provided fields.
+        
+        Args:
+            pk: Primary key (ID) of the action to update
+            
+        Returns:
+            Response: Updated action if found, or 404 if not found
+        """
+        # Read all actions from file
+        actions = self._read_actions()
+        
+        # Find the action with matching ID
+        for i, action in enumerate(actions):
+            if action.get('id') == pk:
+                # Get new data from request
+                updated_action = request.data
+                
+                # Keep the same ID (don't let user change it)
+                updated_action['id'] = pk
+                
+                # Auto-calculate CO2 if fuel_consumed_liters is provided
+                if 'fuel_consumed_liters' in updated_action and 'co2_emitted_kg' not in updated_action:
+                    fuel = updated_action['fuel_consumed_liters']
+                    updated_action['co2_emitted_kg'] = fuel * 2.64
+                
+                # Replace the old action with the new one
+                actions[i] = updated_action
+                
+                # Save back to file
+                self._save_actions(actions)
+                
+                # Return updated action
+                return Response(updated_action)
         
         # If no action found, return 404
         return Response(
