@@ -110,6 +110,7 @@ class ActionDetailView(APIView):
     """
     GET /api/actions/<id>/ - Get single action by ID
     PUT /api/actions/<id>/ - Full update of an action
+    PATCH /api/actions/<id>/ - Partial update of an action
     """
     
     def _get_json_file_path(self):
@@ -218,6 +219,60 @@ class ActionDetailView(APIView):
                     updated_action['co2_emitted_kg'] = fuel * 2.64
                 
                 # Replace the old action with the new one
+                actions[i] = updated_action
+                
+                # Save back to file
+                self._save_actions(actions)
+                
+                # Return updated action
+                return Response(updated_action)
+        
+        # If no action found, return 404
+        return Response(
+            {'error': 'Action not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    def patch(self, request, pk):
+        """
+        PATCH /api/actions/<id>/ - Partial update of an action
+        
+        PATCH only updates the fields you send. All other fields stay unchanged.
+        This is different from PUT which requires ALL fields and replaces everything.
+        
+        Example: To update only the "action" field:
+        PATCH /api/actions/1/ with {"action": "New action name"}
+        All other fields (date, points, etc.) remain unchanged.
+        
+        Args:
+            pk: Primary key (ID) of the action to update
+            
+        Returns:
+            Response: Updated action if found, or 404 if not found
+        """
+        # Read all actions from file
+        actions = self._read_actions()
+        
+        # Find the action with matching ID
+        for i, action in enumerate(actions):
+            if action.get('id') == pk:
+                # Get update data from request (only fields user wants to change)
+                update_data = request.data
+                
+                # Start with existing action and update only provided fields
+                updated_action = {**action, **update_data}
+                
+                # Always keep the same ID (don't let user change it)
+                updated_action['id'] = pk
+                
+                # Auto-calculate CO2 if fuel_consumed_liters is being updated
+                if 'fuel_consumed_liters' in update_data:
+                    fuel = updated_action['fuel_consumed_liters']
+                    updated_action['co2_emitted_kg'] = fuel * 2.64
+                # If fuel wasn't updated but CO2 was manually changed, keep the manual value
+                # (user might want to override the calculation)
+                
+                # Replace the old action with the updated one
                 actions[i] = updated_action
                 
                 # Save back to file
