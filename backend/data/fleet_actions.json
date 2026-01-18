@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "action": "Jakarta to Bandung taxi ride",
+    "date": "2025-01-15",
+    "points": 15,
+    "vehicle_id": "TAXI-001",
+    "vehicle_type": "TAXI_DIESEL",
+    "driver_name": "Budi Santoso",
+    "origin": "Jakarta",
+    "destination": "Bandung",
+    "distance_km": 150.0,
+    "fuel_consumed_liters": 12.5,
+    "co2_emitted_kg": 33.0,
+    "fuel_cost_usd": 11.25,
+    "notes": "Regular passenger route"
+  },
+  {
+    "id": 2,
+    "action": "Jakarta to Surabaya freight delivery",
+    "date": "2025-01-16",
+    "points": 25,
+    "vehicle_id": "TRUCK-001",
+    "vehicle_type": "TRUCK_OLD",
+    "driver_name": "Ahmad Wijaya",
+    "origin": "Jakarta",
+    "destination": "Surabaya",
+    "distance_km": 800.0,
+    "fuel_consumed_liters": 160.0,
+    "co2_emitted_kg": 422.4,
+    "fuel_cost_usd": 144.0,
+    "notes": "Replaced WhatsApp: 'Boss sudah sampai Surabaya, pakai 3 tangki'"
+  }
+]
