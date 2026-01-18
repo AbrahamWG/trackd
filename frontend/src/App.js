@@ -2,10 +2,11 @@
 // It fetches actions from the Django backend and displays them in a table
 
 import { useState, useEffect } from 'react';
-import { getActions, patchAction, deleteAction } from './services/api';
+import { getActions, patchAction, deleteAction, setLogCallback } from './services/api';
 import ActionTable from './components/ActionTable';
 import ActionForm from './components/ActionForm';
 import EditForm from './components/EditForm';
+import LogPanel from './components/LogPanel';
 import './App.css';
 
 function App() {
@@ -16,11 +17,20 @@ function App() {
   const [loading, setLoading] = useState(true);  // Track if data is being fetched
   const [error, setError] = useState(null);      // Store error messages if API call fails
   const [editingAction, setEditingAction] = useState(null);  // Store action being edited (null = not editing)
+  const [logs, setLogs] = useState([]);  // Store API request logs for debugging
+
+  // Function to add log entry when API request is made
+  const addLog = (logEntry) => {
+    setLogs((prevLogs) => [...prevLogs, logEntry]);
+  };
 
   // useEffect hook - runs code when component first loads
   // The empty array [] means it only runs once (when component mounts)
   // This is where I fetch data from the API
   useEffect(() => {
+    // Set up log callback so API service can log requests
+    setLogCallback(addLog);
+
     // Test API connection when component loads
     const fetchActions = async () => {
       try {
@@ -80,15 +90,35 @@ function App() {
   // React automatically updates this when state changes (loading, error, actions)
   return (
     <div className="App">
-      <header style={{ padding: '20px' }}>
-        <h1>Trackd - Sustainability Actions</h1>
+      {/* Main container with fixed max-width and centered */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '20px',
+        paddingBottom: '270px', // Space for log panel at bottom
+      }}>
+        <header style={{ marginBottom: '30px' }}>
+          <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>
+            Trackd - Sustainability Actions
+          </h1>
+        </header>
         
         {/* Show loading message while fetching data */}
-        {loading && <p>Loading actions...</p>}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '20px' }}>
+            <p>Loading actions...</p>
+          </div>
+        )}
         
         {/* Show error message if API call failed */}
         {error && (
-          <div style={{ color: 'red', padding: '20px', background: '#ffe6e6', borderRadius: '5px', margin: '20px' }}>
+          <div style={{
+            color: 'red',
+            padding: '20px',
+            background: '#ffe6e6',
+            borderRadius: '5px',
+            marginBottom: '20px',
+          }}>
             <strong>Error:</strong> {error}
           </div>
         )}
@@ -113,7 +143,10 @@ function App() {
             />
           </>
         )}
-      </header>
+      </div>
+      
+      {/* Log panel at the bottom */}
+      <LogPanel logs={logs} />
     </div>
   );
 }

@@ -56,8 +56,8 @@ function ActionForm({ onActionCreated }) {
   };
 
   return (
-    <div style={{ padding: '20px', background: '#f9f9f9', borderRadius: '5px', marginBottom: '20px' }}>
-      <h2>Add New Action</h2>
+    <div style={{ padding: '20px', background: 'white', borderRadius: '8px', marginBottom: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <h2 style={{ marginTop: 0 }}>Add New Action</h2>
       
       {/* Show error message if form submission failed */}
       {error && (

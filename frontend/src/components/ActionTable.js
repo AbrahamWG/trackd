@@ -14,9 +14,10 @@ function ActionTable({ actions, onEdit, onDelete }) {
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Actions List</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+    <div style={{ background: 'white', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Actions List</h2>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
             <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>ID</th>
@@ -69,6 +70,7 @@ function ActionTable({ actions, onEdit, onDelete }) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

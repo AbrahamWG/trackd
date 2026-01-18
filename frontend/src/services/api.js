@@ -13,6 +13,55 @@ import axios from 'axios';
 // Change this if my Django server runs on a different port
 const API_BASE_URL = 'http://localhost:8000/api';
 
+// Log callback function - set by App.js to track API requests
+let logCallback = null;
+
+// Function to set the log callback from App.js
+export const setLogCallback = (callback) => {
+  logCallback = callback;
+};
+
+// Helper function to log API requests with data
+const logRequest = (method, url, status = null, requestData = null, responseData = null) => {
+  if (logCallback) {
+    const timestamp = new Date().toLocaleTimeString();
+    
+    // Format data for display
+    let dataSummary = null;
+    if (method === 'GET' && responseData) {
+      // For GET requests, show what was retrieved
+      if (Array.isArray(responseData)) {
+        dataSummary = `Retrieved ${responseData.length} action(s)`;
+      } else if (responseData.action) {
+        dataSummary = `Action: "${responseData.action}" (ID: ${responseData.id})`;
+      }
+    } else if (method === 'POST' && requestData) {
+      // For POST, show what was created
+      dataSummary = `Created: "${requestData.action}" (${requestData.points} points)`;
+    } else if ((method === 'PATCH' || method === 'PUT') && requestData) {
+      // For PATCH/PUT, show what was updated
+      const updates = Object.keys(requestData).map(key => `${key}: ${requestData[key]}`).join(', ');
+      dataSummary = `Updated: ${updates}`;
+    } else if (method === 'DELETE') {
+      // For DELETE, extract ID from URL
+      const match = url.match(/\/(\d+)\//);
+      if (match) {
+        dataSummary = `Deleted action ID: ${match[1]}`;
+      }
+    }
+    
+    logCallback({
+      method,
+      url: url.replace(API_BASE_URL, ''),
+      status,
+      timestamp,
+      dataSummary,
+      requestData: requestData ? JSON.stringify(requestData, null, 2) : null,
+      responseData: responseData ? JSON.stringify(responseData, null, 2) : null,
+    });
+  }
+};
+
 // Create axios instance with base URL
 // This saves me from typing the full URL every time
 // Example: api.get('/actions/') becomes http://localhost:8000/api/actions/
@@ -22,6 +71,75 @@ const api = axios.create({
     'Content-Type': 'application/json',  // Tell Django we're sending JSON
   },
 });
+
+// Store request data temporarily to use in response interceptor
+const requestDataMap = new Map();
+
+// Add request interceptor to store request data
+api.interceptors.request.use(
+  (config) => {
+    // Store request data with a unique key (timestamp + method + url)
+    const requestKey = `${Date.now()}-${config.method}-${config.url}`;
+    requestDataMap.set(requestKey, config.data);
+    // Store the key in config so we can retrieve it in response interceptor
+    config._requestKey = requestKey;
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to log responses
+api.interceptors.response.use(
+  (response) => {
+    // Get the request data that was stored using the key from config
+    const requestKey = response.config._requestKey;
+    const requestData = requestKey ? requestDataMap.get(requestKey) : null;
+    if (requestKey) requestDataMap.delete(requestKey);
+    
+    // Log response with both request and response data
+    logRequest(
+      response.config.method.toUpperCase(),
+      response.config.url,
+      response.status,
+      requestData,
+      response.data
+    );
+    
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      const requestKey = error.config._requestKey;
+      const requestData = requestKey ? requestDataMap.get(requestKey) : null;
+      if (requestKey) requestDataMap.delete(requestKey);
+      
+      logRequest(
+        error.config.method.toUpperCase(),
+        error.config.url,
+        error.response.status,
+        requestData,
+        error.response.data
+      );
+    } else if (error.config) {
+      // Network error - still log the request attempt
+      const requestKey = error.config._requestKey;
+      const requestData = requestKey ? requestDataMap.get(requestKey) : null;
+      if (requestKey) requestDataMap.delete(requestKey);
+      
+      logRequest(
+        error.config.method.toUpperCase(),
+        error.config.url,
+        null,
+        requestData,
+        null
+      );
+    }
+    return Promise.reject(error);
+  }
+);
 
 // GET all actions
 // Returns: Array of all actions

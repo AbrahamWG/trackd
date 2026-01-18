@@ -58,8 +58,8 @@ function EditForm({ action, onUpdate, onCancel }) {
   };
 
   return (
-    <div style={{ padding: '20px', background: '#fff3cd', borderRadius: '5px', marginBottom: '20px', border: '2px solid #ffc107' }}>
-      <h2>Edit Action (ID: {action.id})</h2>
+    <div style={{ padding: '20px', background: '#fff3cd', borderRadius: '8px', marginBottom: '20px', border: '2px solid #ffc107', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <h2 style={{ marginTop: 0 }}>Edit Action (ID: {action.id})</h2>
       
       {error && (
         <div style={{ color: 'red', padding: '10px', background: '#ffe6e6', borderRadius: '5px', marginBottom: '10px' }}>
