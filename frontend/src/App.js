@@ -2,7 +2,7 @@
 // It fetches actions from the Django backend and displays them in a table
 
 import { useState, useEffect } from 'react';
-import { getActions, patchAction, deleteAction, setLogCallback } from './services/api';
+import { getActions, deleteAction, setLogCallback } from './services/api';
 import ActionTable from './components/ActionTable';
 import ActionForm from './components/ActionForm';
 import EditForm from './components/EditForm';
