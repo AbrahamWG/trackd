@@ -10,8 +10,9 @@
 import axios from 'axios';
 
 // Base URL for the Django API
-// Change this if my Django server runs on a different port
-const API_BASE_URL = 'http://localhost:8000/api';
+// Uses environment variable in production, falls back to localhost for development
+// Set REACT_APP_API_URL in Railway or .env file for production
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 // Log callback function - set by App.js to track API requests
 let logCallback = null;
